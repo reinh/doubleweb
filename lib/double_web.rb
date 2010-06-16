@@ -1,7 +1,4 @@
 module DoubleWeb
-  autoload :Patch, 'double_web/patch'
-  autoload :Playback, 'double_web/playback'
-  autoload :Watch, 'double_web/watch'
 
   module DriverPatches
     autoload :NetHTTP, 'double_web/driver_patches/net_http'
@@ -13,12 +10,51 @@ module DoubleWeb
     autoload :Yaml, 'double_web/caches/yaml'
   end
 
-  extend Patch
-  extend Watch
-  extend Playback
-  extend Caches::Base
-
   class UnexpectedRequestError < StandardError; end
+
+  def self.patch!
+    unless @patched
+      require 'net/http' unless defined?(Net::HTTP)
+      Net::HTTP.send(:include, DoubleWeb::DriverPatches::NetHTTP)
+    end
+    @patched = true
+  end
+
+  def self.watch!
+    patch!
+    @watch = true
+    if block_given?
+      res = yield
+      @watch = false
+      res
+    end
+  end
+
+  def self.unwatch!
+    @watch = false
+  end
+
+  def self.watch?
+    @watch
+  end
+
+  def self.playback!
+    patch!
+    @playback = true
+    if block_given?
+      res = yield
+      @playback = false
+      res
+    end
+  end
+
+  def self.stop_playback!
+    @playback = false
+  end
+
+  def self.playback?
+    @playback
+  end
 
   def self.clear!
     unwatch!
@@ -35,6 +71,14 @@ module DoubleWeb
 
   def self.cache
     (@cache_strategy ||= DoubleWeb::Caches::Memory).cache
+  end
+
+  def self.[](request)
+    cache[request]
+  end
+
+  def self.[]=(request, response)
+    cache[request] = response
   end
 
 end
