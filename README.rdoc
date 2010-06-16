@@ -1,6 +1,28 @@
 = doubleweb
 
-Description goes here.
+DoubleWeb watches and records Net::HTTP requests so that you can play the
+responses back later. This is useful for tests, for instance to switch from
+testing the network to testing canned responses.
+
+== Example
+
+    # Cache requests as YAML
+    DoubleWeb.cache_strategy = :yaml
+    DoubleWeb.cache.path = File.join(SPECDIR, 'fixtures', 'network.yaml')
+
+    # To record network requests
+
+    before(:all) { DoubleWeb.watch! }
+    after(:all)  { DoubleWeb.unwatch! }
+
+    # To playback network requests
+
+    before(:all) { DoubleWeb.playback! }
+    after(:all)  { DoubleWeb.stop_playback! }
+
+In playback mode, DoubleWeb will return the recorded responses for each request
+and will raise a `DoubleWeb::UnexpectedRequestError` for any requests that do
+not have recorded responses.
 
 == Note on Patches/Pull Requests
  
