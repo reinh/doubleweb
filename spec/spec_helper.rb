@@ -4,6 +4,8 @@ require 'doubleweb'
 require 'spec'
 require 'spec/autorun'
 
+SPECDIR = File.dirname(__FILE__)
+
 Spec::Runner.configure do |config|
   
 end

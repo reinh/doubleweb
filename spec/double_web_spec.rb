@@ -14,6 +14,79 @@ describe DoubleWeb do
     DoubleWeb.clear!
   end
 
+  describe ".init!" do
+    before do
+      DoubleWeb.out = StringIO.new
+    end
+
+    after { DoubleWeb.out = nil }
+    subject { DoubleWeb }
+
+    describe "with internet=on" do
+      before do
+        ENV['internet'] = 'on'
+        DoubleWeb.init!
+      end
+
+      it { should_not be_watch }
+      it { should_not be_playback }
+
+      it "should notify that doubleweb is inactive" do
+        DoubleWeb.out.rewind
+        DoubleWeb.out.read.should == "DoubleWeb: inactive\n"
+      end
+    end
+
+    describe "with internet=off" do
+      before do
+        ENV['internet'] = 'off'
+        DoubleWeb.init!
+      end
+
+      it { should_not be_watch }
+      it { should be_playback }
+
+      it "should notify that doubleweb is in playback mode" do
+        DoubleWeb.out.rewind
+        DoubleWeb.out.read.should == "DoubleWeb: playback mode\n"
+      end
+    end
+
+
+    describe "with internet=watch" do
+      before do
+        ENV['internet'] = 'watch'
+        DoubleWeb.init!
+      end
+
+      it { should be_watch }
+      it { should_not be_playback }
+
+      it "should notify that doubleweb is in playback mode" do
+        DoubleWeb.out.rewind
+        DoubleWeb.out.read.should == "DoubleWeb: watching\n"
+      end
+    end
+
+    describe "without internet=" do
+      before do
+        ENV['internet'] = nil
+        DoubleWeb.init!
+      end
+
+      it { should_not be_watch }
+      it { should_not be_playback }
+
+      it "should notify that doubleweb is in playback mode" do
+        DoubleWeb.out.rewind
+        DoubleWeb.out.read.should == "DoubleWeb: set the `internet` enviroment variable to control DoubleWeb\n" +
+                                     "  options are 'on', 'off', 'watch'\n" +
+                                     "  DoubleWeb is currently disabled.\n"
+      end
+    end
+
+  end
+
   describe ".patch!" do
     before { DoubleWeb.patch! }
 

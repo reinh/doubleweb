@@ -12,6 +12,18 @@ module DoubleWeb
 
   class UnexpectedRequestError < StandardError; end
 
+  def self.init!
+    case ENV['internet']
+    when 'on'    then puts "DoubleWeb: inactive"; clear!
+    when 'off'   then puts "DoubleWeb: playback mode"; playback!
+    when 'watch' then puts "DoubleWeb: watching"; watch!
+    else
+      puts "DoubleWeb: set the `internet` enviroment variable to control DoubleWeb"
+      puts "  options are 'on', 'off', 'watch'"
+      puts "  DoubleWeb is currently disabled."
+    end
+  end
+
   def self.patch!
     unless @patched
       require 'net/http' unless defined?(Net::HTTP)
@@ -79,6 +91,14 @@ module DoubleWeb
 
   def self.[]=(request, response)
     cache[request] = response
+  end
+
+  class << self; attr_accessor :out end
+
+  private
+
+  def self.puts(*args)
+    (out || STDOUT).puts(*args)
   end
 
 end

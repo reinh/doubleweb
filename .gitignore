@@ -20,3 +20,5 @@ pkg
 
 ## PROJECT::SPECIFIC
 tags
+.yardoc
+doc

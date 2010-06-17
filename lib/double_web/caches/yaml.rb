@@ -32,7 +32,7 @@ module DoubleWeb::Caches::Yaml
 
     def load
       clear unless exists?
-      open('r') {|fh| YAML.load(fh) } || {}
+      YAML.load_file(fh) || {}
     end
 
     def path?; path end
