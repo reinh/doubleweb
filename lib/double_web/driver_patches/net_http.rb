@@ -16,6 +16,46 @@ module DoubleWeb::DriverPatches
         response
       end
     end
+
+    module Equivocable
+      def hash
+        [self.class, 0, *hash_attrs].map(&:hash).reduce(:^)
+      end
+
+      def eql?(other)
+        hash == other.hash
+      end
+
+      def ==(other)
+        hash_attrs = other.hash_attrs
+      end
+
+      protected
+      def hash_attrs
+        raise NotImplementedError, "define 'hash_attrs' to provide #hash, #eql? and #== semantics"
+      end
+
+    end
+
+    module RequestPatch
+      include Equivocable
+
+      protected
+      def hash_attrs
+        [path, method, body]
+      end
+
+    end
+
+    module ResponsePatch
+      include Equivocable
+
+      protected
+      def hash_attrs
+        [code, @version, message]
+      end
+
+    end
+
   end
 end
-

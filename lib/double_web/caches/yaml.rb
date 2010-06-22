@@ -1,8 +1,10 @@
 module DoubleWeb::Caches::Yaml
+
   include DoubleWeb::Caches::Base
 
   class Store
     require 'yaml'
+    require 'zaml' # YAML.dump is broken
     require 'singleton'
     include Singleton
     attr_accessor :path
@@ -11,28 +13,28 @@ module DoubleWeb::Caches::Yaml
       dump({}) if path?
     end
 
-    def []=(key, value)
-      dump(load.merge(key => value))
+    def []=(request, response)
+      dump(load.merge(request => response))
     end
 
-    def [](key)
-      load[key]
+    def [](request)
+      p self.load
+      self.load[request]
     end
 
     private
 
     def open(mode, &block)
-      raise "Set DoubleWeb.cache.path to use YAML storage" unless path
       File.open(path, mode, &block)
     end
 
     def dump(object)
-      open('w') {|fh| YAML.dump(object, fh) }
+      open('w') {|fh| fh.write ZAML.dump(object) }
     end
 
     def load
       clear unless exists?
-      YAML.load_file(fh) || {}
+      open('r') {|fh| YAML.load(fh) } || {}
     end
 
     def path?; path end

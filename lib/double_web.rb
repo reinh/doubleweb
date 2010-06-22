@@ -18,9 +18,9 @@ module DoubleWeb
     when 'off'   then puts "DoubleWeb: playback mode"; playback!
     when 'watch' then puts "DoubleWeb: watching"; watch!
     else
-      puts "DoubleWeb: set the `internet` enviroment variable to control DoubleWeb"
-      puts "  options are 'on', 'off', 'watch'"
-      puts "  DoubleWeb is currently disabled."
+      puts "DoubleWeb: set the `internet` enviroment variable to control DoubleWeb",
+           "  options are 'on', 'off', 'watch'",
+           "  DoubleWeb is currently disabled."
     end
   end
 
@@ -28,6 +28,8 @@ module DoubleWeb
     unless @patched
       require 'net/http' unless defined?(Net::HTTP)
       Net::HTTP.send(:include, DoubleWeb::DriverPatches::NetHTTP)
+      Net::HTTPRequest.send(:include, DoubleWeb::DriverPatches::NetHTTP::RequestPatch)
+      Net::HTTPResponse.send(:include, DoubleWeb::DriverPatches::NetHTTP::ResponsePatch)
     end
     @patched = true
   end
@@ -91,14 +93,6 @@ module DoubleWeb
 
   def self.[]=(request, response)
     cache[request] = response
-  end
-
-  class << self; attr_accessor :out end
-
-  private
-
-  def self.puts(*args)
-    (out || STDOUT).puts(*args)
   end
 
 end

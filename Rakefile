@@ -9,6 +9,7 @@ begin
     gem.email = "reinh@reinh.com"
     gem.homepage = "http://github.com/reinh/doubleweb"
     gem.authors = ["Rein Henrichs"]
+    gem.add_dependency "zaml"
     gem.add_development_dependency "rspec", ">= 1.2.9"
     gem.add_development_dependency "yard", ">= 0"
     gem.add_development_dependency "fakeweb"

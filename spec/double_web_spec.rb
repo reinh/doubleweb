@@ -15,11 +15,8 @@ describe DoubleWeb do
   end
 
   describe ".init!" do
-    before do
-      DoubleWeb.out = StringIO.new
-    end
-
-    after { DoubleWeb.out = nil }
+    before  { @old, $stdout = $stdout, StringIO.new }
+    after   { $stdout = @old }
     subject { DoubleWeb }
 
     describe "with internet=on" do
@@ -32,8 +29,8 @@ describe DoubleWeb do
       it { should_not be_playback }
 
       it "should notify that doubleweb is inactive" do
-        DoubleWeb.out.rewind
-        DoubleWeb.out.read.should == "DoubleWeb: inactive\n"
+        $stdout.rewind
+        $stdout.read.should == "DoubleWeb: inactive\n"
       end
     end
 
@@ -47,8 +44,8 @@ describe DoubleWeb do
       it { should be_playback }
 
       it "should notify that doubleweb is in playback mode" do
-        DoubleWeb.out.rewind
-        DoubleWeb.out.read.should == "DoubleWeb: playback mode\n"
+        $stdout.rewind
+        $stdout.read.should == "DoubleWeb: playback mode\n"
       end
     end
 
@@ -63,8 +60,8 @@ describe DoubleWeb do
       it { should_not be_playback }
 
       it "should notify that doubleweb is in playback mode" do
-        DoubleWeb.out.rewind
-        DoubleWeb.out.read.should == "DoubleWeb: watching\n"
+        $stdout.rewind
+        $stdout.read.should == "DoubleWeb: watching\n"
       end
     end
 
@@ -78,8 +75,8 @@ describe DoubleWeb do
       it { should_not be_playback }
 
       it "should notify that doubleweb is in playback mode" do
-        DoubleWeb.out.rewind
-        DoubleWeb.out.read.should == "DoubleWeb: set the `internet` enviroment variable to control DoubleWeb\n" +
+        $stdout.rewind
+        $stdout.read.should == "DoubleWeb: set the `internet` enviroment variable to control DoubleWeb\n" +
                                      "  options are 'on', 'off', 'watch'\n" +
                                      "  DoubleWeb is currently disabled.\n"
       end
